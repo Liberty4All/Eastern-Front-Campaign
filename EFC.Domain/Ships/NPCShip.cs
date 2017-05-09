@@ -35,7 +35,7 @@ namespace EFC.Domain.Ships
                         new XAttribute("integer", "yes")));
                 result.Add(
                     new XElement("log",
-                        new XAttribute("text", "NPC Ship: " + this.Name + " created")));
+                        new XAttribute("text", $"Neutral Ship: {this.Name} created")));
                 return result;
             }
         }

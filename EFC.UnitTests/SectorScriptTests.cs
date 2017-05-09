@@ -5,6 +5,7 @@ using EFC.Sectors;
 using System.Collections.Generic;
 using EFC.Domain.Ships;
 using EFC.Domain;
+using XmlDiffLib;
 
 namespace EFC.UnitTests
 {
@@ -12,7 +13,7 @@ namespace EFC.UnitTests
     public class SectorScriptTests
     {
         [TestMethod]
-        [TestCategory("Undefined")]
+        [TestCategory("Create Sector")]
         public void CreateSector_SectorName_SectorCreated()
         {
             // Arrange
@@ -76,13 +77,16 @@ namespace EFC.UnitTests
             result.Should().NotBeNull();
             result.MissionXML.Should().NotBeNull();
             result.MissionXML.IsEmpty.Should().BeFalse();
-            System.Diagnostics.Debug.WriteLine(result.MissionXML);
 
-            result.MissionXML.ToString().ShouldBeEquivalentTo(fakeXML.ToString());
+            XmlDiff diff = new XmlDiff(result.MissionXML.ToString(), fakeXML.ToString()); 
+            bool diffResult = diff.CompareDocuments(new XmlDiffOptions());
+            System.Diagnostics.Debug.WriteLine(diff.ToString());
+            diff.DiffNodeList.Count.Should().Be(0);
+            diffResult.Should().BeTrue();
         }
 
         [TestMethod]
-        [TestCategory("Undefined")]
+        [TestCategory("Player Ship Creation")]
         public void PlayerShipCreationXML_Nothing_CorrectXML()
         {
             // Arrange
@@ -124,7 +128,7 @@ namespace EFC.UnitTests
         }
 
         [TestMethod]
-        [TestCategory("Undefined")]
+        [TestCategory("Player Ship Destruction")]
         public void PlayerShipDestructionXML_Nothing_CorrectXML()
         {
             // Arrange
@@ -161,7 +165,7 @@ namespace EFC.UnitTests
         }
 
         [TestMethod]
-        [TestCategory("Undefined")]
+        [TestCategory("Enemy Ship Creation")]
         public void EnemyShipCreationXML_NoParameters_CorrectXML()
         {
             // Arrange
@@ -210,7 +214,7 @@ namespace EFC.UnitTests
         }
 
         [TestMethod]
-        [TestCategory("Undefined")]
+        [TestCategory("Enemy Ship Destruction")]
         public void EnemyShipDestructionXML_Nothing_CorrectXML()
         {
             // Arrange
@@ -249,14 +253,14 @@ namespace EFC.UnitTests
         }
 
         [TestMethod]
-        [TestCategory("Undefined")]
+        [TestCategory("Neutral Ship Creation")]
         public void NPCShipCreationXML_NoParameters_CorrectXML()
         {
             // Arrange
             NPCShip ship = new NPCShip()
             {
                 Angle = 90,
-                Name="Friendly Freddy",
+                Name="Tanker",
                 Position = new Position(10000,0,10000),
                 Race = "Terran",
                 Hull = "Bulk Cargo cargo",
@@ -289,14 +293,14 @@ namespace EFC.UnitTests
         }
 
         [TestMethod]
-        [TestCategory("Undefined")]
+        [TestCategory("Neutral Ship Destruction")]
         public void NPCShipDestructionXML_Nothing_CorrectXML()
         {
             // Arrange
             NPCShip ship = new NPCShip
             {
                 Angle = 90,
-                Name = "Friendly Freddy",
+                Name = "Tanker",
                 Position = new Position(40000, 0, 40000),
                 Hull = "Bulk Cargo cargo",
                 Race = "Terran",
@@ -331,8 +335,6 @@ namespace EFC.UnitTests
             XElement result = new XElement("mission_data",
                 new XAttribute("version", "2.4"),
                 new XElement("start",
-                    new XComment("===== Create Player Ships ====="),
-                    new XComment("***** Artemis Creation *****"),
                     new XElement("create",
                         new XAttribute("angle", "0"),
                         new XAttribute("name", "Artemis"),
@@ -395,10 +397,10 @@ namespace EFC.UnitTests
                    new XElement("log",
                         new XAttribute("text", "Enemy Ship: Vindicator created")),
                     new XComment("===== Create Neutral Ships ====="),
-                    new XComment("***** Friendly Freddy Creation *****"),
+                    new XComment("***** Tanker Creation *****"),
                     new XElement("create",
                         new XAttribute("angle", "180"),
-                        new XAttribute("name", "Friendly Freddy"),
+                        new XAttribute("name", "Tanker"),
                         new XAttribute("z", "25000"),
                         new XAttribute("y", "0"),
                         new XAttribute("x", "25000"),
@@ -407,11 +409,11 @@ namespace EFC.UnitTests
                         new XAttribute("sideValue", "0"),
                         new XAttribute("type", "neutral")),
                     new XElement("set_variable",
-                        new XAttribute("name", "FriendlyFreddyDeath"),
+                        new XAttribute("name", "TankerDeath"),
                         new XAttribute("value", "0"),
                         new XAttribute("integer", "yes")),
                    new XElement("log",
-                        new XAttribute("text", "Neutral Ship: Friendly Freddy created")),
+                        new XAttribute("text", "Neutral Ship: Tanker created")),
 
                     new XElement("big_message",
                         new XAttribute("title", "Alpha: FirstMission Started"),
@@ -466,19 +468,19 @@ namespace EFC.UnitTests
                         new XAttribute("value", "1"),
                         new XAttribute("integer", "yes"))),
                 new XComment("===== Neutral Destruction Events ====="),
-                new XComment("***** Friendly Freddy Destruction *****"),
+                new XComment("***** Tanker Destruction *****"),
                 new XElement("event",
-                    new XAttribute("name", "Friendly Freddy Death Check"),
+                    new XAttribute("name", "Tanker Death Check"),
                     new XElement("if_variable",
-                        new XAttribute("name", "FriendlyFreddyDeath"),
+                        new XAttribute("name", "TankerDeath"),
                         new XAttribute("comparator", "EQUALS"),
                         new XAttribute("value", "0")),
                     new XElement("if_not_exists",
-                        new XAttribute("name", "Friendly Freddy")),
+                        new XAttribute("name", "Tanker")),
                     new XElement("log",
-                        new XAttribute("text", "Friendly Freddy destroyed")),
+                        new XAttribute("text", "Tanker destroyed")),
                     new XElement("set_variable",
-                        new XAttribute("name", "FriendlyFreddyDeath"),
+                        new XAttribute("name", "TankerDeath"),
                         new XAttribute("value", "1"),
                         new XAttribute("integer", "yes"))),
                 new XComment("===== Surrender Tracking Events ====="),

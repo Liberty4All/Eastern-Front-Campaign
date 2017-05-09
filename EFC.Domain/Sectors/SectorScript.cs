@@ -109,7 +109,8 @@ namespace EFC.Sectors
             string MissionTitle = _options.SectorName + ": " + _options.MissionName + " Started";
             XElement result = new XElement("start");
 
-            result.Add(new XComment("===== Create Player Ships ====="));
+            // diff tool does not like comments right after start
+            //result.Add(new XComment("===== Create Player Ships ====="));
             CreateShips(ref result, _options.PlayerShips);
 
             result.Add(new XComment("===== Create Enemy Ships ====="));
@@ -139,7 +140,8 @@ namespace EFC.Sectors
         {
             foreach (IShip ship in ships)
             {
-                xml.Add(new XComment("***** " + ship.Name + " Creation *****"));
+                // diff tool does not like comments right after start
+                //xml.Add(new XComment("***** " + ship.Name + " Creation *****"));
 
                 foreach (XElement item in ship.CreationXML)
                 {

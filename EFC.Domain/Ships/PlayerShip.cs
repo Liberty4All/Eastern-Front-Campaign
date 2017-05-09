@@ -15,8 +15,8 @@ namespace EFC.Domain.Ships
         {
             get
             {
-                List<XElement> result = new List<XElement>();
-                result.Add(
+                List<XElement> result = new List<XElement>
+                {
                     new XElement("create",
                         new XAttribute("angle", Angle),
                         new XAttribute("name", Name),
@@ -24,17 +24,16 @@ namespace EFC.Domain.Ships
                         new XAttribute("y", Position.Y),
                         new XAttribute("x", Position.X),
                         new XAttribute("player_slot", Slot),
-                        new XAttribute("raceKeys","TSN player"),
-                        new XAttribute("hullKeys",GetShipType() + " player"),
-                        new XAttribute("type", "player")));
-                result.Add(
+                        new XAttribute("raceKeys", "TSN player"),
+                        new XAttribute("hullKeys", GetShipType() + " player"),
+                        new XAttribute("type", "player")),
                     new XElement("set_variable",
                         new XAttribute("name", Name + "Death"),
-                        new XAttribute("value","0"),
-                        new XAttribute("integer","yes")));
-                result.Add(
+                        new XAttribute("value", "0"),
+                        new XAttribute("integer", "yes")),
                     new XElement("log",
-                        new XAttribute("text", "Player Ship: " + Name + " created")));
+                        new XAttribute("text", "Player Ship: " + Name + " created"))
+                };
                 return result;
             }
         }
