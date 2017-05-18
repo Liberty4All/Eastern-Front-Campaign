@@ -54,6 +54,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sectors\SectorScript.cs" />
     <Compile Include="Ships\EnemyShip.cs" />
+    <Compile Include="Ships\Enhancements.cs" />
+    <Compile Include="Ships\IEnhancement.cs" />
     <Compile Include="Ships\IShip.cs" />
     <Compile Include="Ships\NPCShip.cs" />
     <Compile Include="Ships\PlayerShip.cs" />

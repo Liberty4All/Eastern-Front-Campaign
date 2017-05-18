@@ -327,7 +327,133 @@ namespace EFC.UnitTests
 
             // Assert
             result.Should().NotBeNull();
-            result.Should().BeEquivalentTo(fakeXML);
+            result.Should().BeEquivalentTo(XElement.Parse(fakeXML.ToString()));
+        }
+
+        [TestMethod]
+        public void ShipEnhancement_EnhancementType_CorrectXML()
+        {
+            // Arrange
+            EnhancementType enhancementType = EnhancementType.ThetaGenerator;
+            PlayerShip ship = new PlayerShip
+            {
+                Angle = 90,
+                Name = "Fuzzy",
+                Position = new Position(40000, 0, 40000),
+                ShipType = ShipType.Battleship,
+                Slot = 0
+            };
+            ship.Enhancements.Add(EnhancementType.ThetaGenerator);
+
+            XElement folderXML = new XElement("folder_arme",
+                new XAttribute("name_arme", "Fuel Collection System"),
+                new XAttribute("id_arme", "1b665acb-40f7-4ca9-883b-88e1c75586f1"));
+
+            XElement event1XML = new XElement("event",
+                new XAttribute("name_arme", "Activate Fuel Collectors"),
+                new XAttribute("id_arme", "fb894052-2832-46df-9d20-0819853aeb2d"),
+                new XAttribute("parent_id_arme", "1b665acb-40f7-4ca9-883b-88e1c75586f1"),
+                new XElement("if_variable",
+                    new XAttribute("name","Fuel Collection"),
+                    new XAttribute("comparator","EQUALS"),
+                    new XAttribute("value","0.0")),
+                new XElement("if_client_key",
+                    new XAttribute("keyText","R")),
+                new XElement("warning_popup_message",
+                    new XAttribute("message","Fuel Collectors Activated"),
+                    new XAttribute("consoles","E")),
+                new XElement("set_variable",
+                    new XAttribute("name","Collection Bonus"),
+                    new XAttribute("value","1.0")),
+                new XElement("set_timer",
+                    new XAttribute("name","Fuel Collection"),
+                    new XAttribute("seconds","3")),
+                new XElement("set_timer",
+                    new XAttribute("name","Fuel Collector Limits"),
+                    new XAttribute("seconds","3")), 
+                new XElement("set_variable",
+                    new XAttribute("name","Fuel Collector Limits"),
+                    new XAttribute("value","1.0")),
+                new XElement("set_variable",
+                    new XAttribute("name","Fuel Collection"),
+                    new XAttribute("value","1.0"))
+            );
+            XElement event2XML = new XElement("event",
+                new XAttribute("name_arme", "Fuel Collectors Active"),
+                new XAttribute("id_arme", "91a28c7e-b444-4886-aa8c-15ba839ce06f"),
+                new XAttribute("parent_id_arme", "1b665acb-40f7-4ca9-883b-88e1c75586f1"),
+                new XElement("if_variable",
+                    new XAttribute("name", "Fuel Collection"),
+                    new XAttribute("comparator", "EQUALS"),
+                    new XAttribute("value", "1.0")),
+                new XElement("if_object_property",
+                    new XAttribute("property", "energy"),
+                    new XAttribute("name", ship.Name),
+                    new XAttribute("comparator", "LESS_EQUAL"),
+                    new XAttribute("value", "981.0")),
+                new XElement("if_object_property",
+                    new XAttribute("property", "throttle"),
+                    new XAttribute("name", ship.Name),
+                    new XAttribute("comparator", "LESS"),
+                    new XAttribute("value", "0.5")),
+                new XElement("if_object_property",
+                    new XAttribute("property", "throttle"),
+                    new XAttribute("name", ship.Name),
+                    new XAttribute("comparator", "GREATER"),
+                    new XAttribute("value", "0.1")),
+                new XElement("if_timer_finished",
+                    new XAttribute("name", "Fuel Collection")),
+                new XElement("if_object_property",
+                    new XAttribute("property", "shieldsOn"),
+                    new XAttribute("name", ship.Name),
+                    new XAttribute("comparator", "EQUALS"),
+                    new XAttribute("value", "0.0")),
+                new XElement("addto_object_property",
+                    new XAttribute("value", "20.0"),
+                    new XAttribute("property", "energy"),
+                    new XAttribute("name", ship.Name)),
+                  new XElement("set_timer",
+                    new XAttribute("name", "Fuel Collection"),
+                    new XAttribute("seconds", "3"))
+            );
+
+            XElement event3XML = new XElement("event",
+                new XAttribute("name_arme","Deactivate Fuel Collectors"),
+                new XAttribute("id_arme","e29f5dc6-4bb2-4ee2-9c5a-769fb5f9959e"),
+                new XAttribute("parent_id_arme","1b665acb-40f7-4ca9-883b-88e1c75586f1"),
+                new XElement("if_variable",
+                    new XAttribute("name","Fuel Collection"),
+                    new XAttribute("comparator","EQUALS"),
+                    new XAttribute("value","1.0")),
+                new XElement("if_client_key",
+                    new XAttribute("keyText","T")),
+                new XElement("set_variable",
+                    new XAttribute("name","Fuel Collection")),
+                    new XAttribute("value","0.0"),
+                new XElement("set_variable",
+                    new XAttribute("name","Collection Bonus"),
+                    new XAttribute("value","0.0")),
+                new XElement("set_variable",
+                    new XAttribute("name","Fuel Collector Limits"),
+                    new XAttribute("value","0.0"))
+            );
+
+            List<XElement> testXML = new List<XElement>();
+            testXML.Add(folderXML);
+            testXML.Add(event1XML);
+            testXML.Add(event2XML);
+            testXML.Add(event3XML);
+
+            // Act
+            var result = ship.AddEnhancement(enhancementType);
+
+            // Assert
+            result.Should().NotBeNullOrEmpty();
+            result[0].Should().BeEquivalentTo(XElement.Parse(testXML[0].ToString()));
+            result[1].Should().BeEquivalentTo(XElement.Parse(testXML[1].ToString()));
+            result[2].Should().BeEquivalentTo(XElement.Parse(testXML[2].ToString()));
+            result[3].Should().BeEquivalentTo(XElement.Parse(testXML[3].ToString()));
+
         }
 
         private XElement CreateTestXML()
